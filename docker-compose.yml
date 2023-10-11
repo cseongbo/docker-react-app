@@ -1,0 +1,36 @@
+version: '3'                        # verseion --> 도커 컴포즈의 버전
+services:                           # services --> 컨테이너들을 감싸고 있는 부분. 이곳에 실행하려는 컨테이너들을 정의
+  # redis-server:                 # 컨테이너 이름
+  #   image: "redis"              # image --> 컨테이너에서 사용하는 이미지
+  react:                            # 컨테이너 이름
+    build:                          # build --> Docker파일을 읽어서 이미지를 빌드 해야하는데 그 도커 파일의 위치를 알려주는것 / . 하면 현재 디렉토리를 가리키는것(docker-compose.yml파일과 동일한 디렉토리)
+      context: .                    # context --> 도커 이미지를 구성하기 위한 파일들과 폴더들이 있는 위치 / Dockerfile.dev도 docker-compose.yml과 같은 디렉토리에 있기 때문에 컨텍스트에 같은 디렉토리를 의미하는 .을 사용
+      dockerfile: Dockerfile.dev    # dockerfile --> 도커 파일 어떤 것인지 지정
+    ports:                          # ports --> 포트 맵핑 / 로컬포트:컨테이너포트
+      - "3000:3000"
+    volumes:                        # volumes --> 로컬 머신에 있는 파일들 맵핑
+      - /usr/src/app/node_modules   # -v /usr/src/app/node_modules --> 첫번째 v  호스트 디렉토리에 node_modules은 없기에 컨테이너에 맵핑을 하지말라고 하는것
+      - ./:/usr/src/app             # -v $(pwd):/usr/src/app --> 두번째 v  pwd(./) 경로에 있는 디렉토리 혹은 파일을 컨테이너의 /usr/src/app경로에서 참조
+    stdin_open: true                # 리액트 앱을 끌때 필요(버그 수정)
+  tests:                             
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /usr/src/app/node_modules
+      - ./:/usr/src/app
+    command: ["npm", "run", "test"] # command --> 테스트 컨테이너 시작할때 실행 되는 명령어
+
+
+
+
+# docker-compose build --> 이미지를 빌드하기만 하며 
+
+# docker-compose up --> 이미지가 없을때 이미지를 빌드하고 컨테이너를 시작한다.
+# docker-compose up --build --> 이미지가 있든 없든 무조건 다시 이미지를 빌드하고 컨테이너를 시작한다
+
+# docker-compose down --> 종료
+
+# docker-compose up 명령어는 해당 docker-compose.yml 파일이 있는 디렉토리에서 실행해야함
+
+# docker compose up -d --> -d : detached 모드로서 앱을 백그라운드에서 실행시킨다. 그래서 앱에서 나오는 output을 표출하지 않는다.
