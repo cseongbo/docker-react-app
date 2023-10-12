@@ -17,6 +17,7 @@ script:
 
 deploy: 
   provider: elasticbeanstalk
+  edge: true
   region: "ap-northeast-2"
   app: "docker-react-app"
   env: "Docker-react-app-env"
